@@ -1,0 +1,27 @@
+# Firebase
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Env / secrets — never commit
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*

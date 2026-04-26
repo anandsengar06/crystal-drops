@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crystal Drops — Choose a Background</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#eef2f7;color:#0b1f3a;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;padding:32px 16px 60px}
+.page{max-width:1320px;margin:0 auto}
+.page-head{text-align:center;margin-bottom:32px}
+.page-head h1{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.page-head p{color:#64748b;font-size:15px;max-width:600px;margin:0 auto;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.tile{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 8px rgba(15,27,45,.05),0 12px 40px rgba(15,27,45,.08);transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
+.tile:hover{transform:translateY(-4px);box-shadow:0 2px 8px rgba(15,27,45,.05),0 18px 50px rgba(15,27,45,.12)}
+.preview{position:relative;height:280px;overflow:hidden;background:#f0f9ff}
+.hero-mock{background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);padding:14px 16px 22px;text-align:center;color:#0369a1;position:relative;z-index:2}
+.hero-mock::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 42' preserveAspectRatio='none'%3E%3Cpath d='M0 42V22c150 20 300 20 450 10s300-20 450-10 300 30 300 20V42z' fill='%23f0f9ff'/%3E%3C/svg%3E") center/100% 100% no-repeat}
+.logo-mock{width:32px;height:32px;margin:0 auto 6px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:grid;place-items:center;border:1px solid rgba(0,0,0,.05)}
+.logo-mock svg{width:16px;height:16px;color:#fff}
+.brand-mock{font-size:14px;font-weight:800;color:#075985}
+.sub-mock{font-size:8px;letter-spacing:2px;font-weight:700;color:#0369a1;margin-top:2px}
+.body-mock{position:relative;height:150px;padding:22px 20px 0;z-index:1}
+.prod-mock{background:#fff;border:2px solid #bae6fd;border-radius:14px;padding:10px;text-align:center;max-width:130px;margin:0 auto;box-shadow:0 6px 18px rgba(14,165,233,.1);position:relative;z-index:3}
+.pi-mock{width:40px;height:40px;margin:0 auto 6px;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);display:grid;place-items:center;color:#fff}
+.pi-mock svg{width:22px;height:22px}
+.prod-mock .pn{font-size:11px;font-weight:700;color:#0b1f3a}
+.prod-mock .pp{font-size:10px;color:#64748b;margin-top:1px}
+.prod-mock .pp b{color:#0b1f3a;font-weight:800}
+.tile-body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+.name{font-size:15px;font-weight:700;color:#0b1f3a;margin-bottom:3px}
+.desc{font-size:12.5px;color:#64748b;line-height:1.4;margin-bottom:14px;flex:1}
+.actions{display:flex;gap:8px}
+.btn{flex:1;padding:10px 10px;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;box-shadow:0 6px 14px rgba(14,165,233,.3)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-ghost{background:#f1f5f9;color:#0b1f3a}
+.btn-ghost:hover{background:#e2e8f0}
+.badge-cur{position:absolute;top:10px;right:10px;background:#fff;color:#0369a1;font-size:9px;font-weight:800;padding:3px 8px;border-radius:999px;letter-spacing:.5px;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,.12);z-index:5}
+.back{display:inline-flex;align-items:center;gap:6px;color:#0284c7;text-decoration:none;font-weight:600;font-size:13px;margin-top:26px;padding:10px 16px;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(15,27,45,.06)}
+.center{text-align:center}
+
+/* === BG OPTIONS === */
+/* bg-none: plain */
+.bg-none .body-mock{background:#f6fafd}
+
+/* bg-bubbles: floating bubbles */
+.bg-bubbles .body-mock{background:#f0f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180' viewBox='0 0 300 180'%3E%3Ccircle cx='40' cy='30' r='14' fill='none' stroke='%230ea5e9' stroke-width='1.2' opacity='0.3'/%3E%3Ccircle cx='80' cy='80' r='8' fill='%2338bdf8' opacity='0.25'/%3E%3Ccircle cx='240' cy='40' r='20' fill='none' stroke='%230284c7' stroke-width='1.2' opacity='0.25'/%3E%3Ccircle cx='270' cy='110' r='10' fill='%2338bdf8' opacity='0.3'/%3E%3Ccircle cx='150' cy='140' r='16' fill='none' stroke='%230ea5e9' stroke-width='1.2' opacity='0.3'/%3E%3Ccircle cx='60' cy='160' r='6' fill='%230ea5e9' opacity='0.25'/%3E%3Ccircle cx='200' cy='100' r='5' fill='%230ea5e9' opacity='0.35'/%3E%3Ccircle cx='110' cy='40' r='4' fill='%2338bdf8' opacity='0.4'/%3E%3C/svg%3E")}
+
+/* bg-ripples: concentric ripples */
+.bg-ripples .body-mock{background:#f0f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180' viewBox='0 0 300 180'%3E%3Cg stroke='%230ea5e9' stroke-width='1.3' fill='none' opacity='0.25'%3E%3Ccircle cx='60' cy='160' r='18'/%3E%3Ccircle cx='60' cy='160' r='34'/%3E%3Ccircle cx='60' cy='160' r='50'/%3E%3Ccircle cx='250' cy='40' r='15'/%3E%3Ccircle cx='250' cy='40' r='28'/%3E%3Ccircle cx='250' cy='40' r='42'/%3E%3C/g%3E%3C/svg%3E")}
+
+/* bg-droplets: small droplets */
+.bg-droplets .body-mock{background:#f0f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M30 20c0 5-3 9-6 9s-6-4-6-9 6-12 6-12 6 7 6 12z' fill='%230ea5e9' opacity='0.15'/%3E%3Cpath d='M90 60c0 4-2.5 7-5 7s-5-3-5-7 5-10 5-10 5 6 5 10z' fill='%2338bdf8' opacity='0.18'/%3E%3Cpath d='M60 90c0 3-2 5-4 5s-4-2-4-5 4-8 4-8 4 5 4 8z' fill='%230284c7' opacity='0.15'/%3E%3C/svg%3E")}
+
+/* bg-waves: flowing horizontal wave lines */
+.bg-waves .body-mock{background:#f0f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='180' viewBox='0 0 400 180'%3E%3Cpath d='M0 30 Q 50 20 100 30 T 200 30 T 300 30 T 400 30' stroke='%2338bdf8' stroke-width='1.5' fill='none' opacity='0.3'/%3E%3Cpath d='M0 70 Q 50 60 100 70 T 200 70 T 300 70 T 400 70' stroke='%230ea5e9' stroke-width='1.5' fill='none' opacity='0.25'/%3E%3Cpath d='M0 110 Q 50 100 100 110 T 200 110 T 300 110 T 400 110' stroke='%230284c7' stroke-width='1.5' fill='none' opacity='0.25'/%3E%3Cpath d='M0 150 Q 50 140 100 150 T 200 150 T 300 150 T 400 150' stroke='%2338bdf8' stroke-width='1.5' fill='none' opacity='0.3'/%3E%3C/svg%3E") repeat}
+
+/* bg-blobs: organic blob shapes */
+.bg-blobs .body-mock{background:#f0f9ff}
+.bg-blobs .body-mock::before,.bg-blobs .body-mock::after{content:"";position:absolute;border-radius:50%;filter:blur(40px);pointer-events:none}
+.bg-blobs .body-mock::before{width:150px;height:150px;background:#bae6fd;top:-40px;left:-30px;opacity:0.6}
+.bg-blobs .body-mock::after{width:180px;height:180px;background:#7dd3fc;bottom:-60px;right:-40px;opacity:0.45}
+
+/* bg-splash: water splash graphic */
+.bg-splash .body-mock{background:#f0f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180' viewBox='0 0 300 180'%3E%3Cg opacity='0.22'%3E%3Cpath d='M30 140 Q 20 110 40 100 Q 50 120 70 115 Q 60 135 80 140 Q 55 160 30 140z' fill='%230ea5e9'/%3E%3Ccircle cx='90' cy='100' r='3' fill='%230ea5e9'/%3E%3Ccircle cx='100' cy='130' r='2' fill='%230ea5e9'/%3E%3Ccircle cx='75' cy='155' r='2.5' fill='%230ea5e9'/%3E%3Cpath d='M230 40 Q 225 20 245 15 Q 255 30 275 28 Q 265 45 280 55 Q 255 65 230 40z' fill='%2338bdf8'/%3E%3Ccircle cx='290' cy='20' r='3' fill='%2338bdf8'/%3E%3Ccircle cx='260' cy='75' r='2' fill='%2338bdf8'/%3E%3C/g%3E%3C/svg%3E") no-repeat center/cover}
+
+/* bg-grid: water molecule dot grid */
+.bg-grid .body-mock{background:#f0f9ff;background-image:radial-gradient(circle,#38bdf8 1.2px,transparent 1.2px);background-size:18px 18px;background-position:0 0}
+.bg-grid .body-mock > *{position:relative;z-index:2}
+.bg-grid .body-mock::before{content:"";position:absolute;inset:0;background:rgba(240,249,255,.3);pointer-events:none}
+
+/* bg-topo: topographic wave contours */
+.bg-topo .body-mock{background:#f0f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180' viewBox='0 0 300 180'%3E%3Cg fill='none' stroke='%230ea5e9' stroke-width='1' opacity='0.25'%3E%3Cpath d='M-20 60 Q 40 40 80 55 T 160 50 T 240 65 T 320 50'/%3E%3Cpath d='M-20 90 Q 40 70 80 85 T 160 80 T 240 95 T 320 80'/%3E%3Cpath d='M-20 120 Q 40 100 80 115 T 160 110 T 240 125 T 320 110'/%3E%3Cpath d='M-20 150 Q 40 130 80 145 T 160 140 T 240 155 T 320 140'/%3E%3C/g%3E%3C/svg%3E") no-repeat center/cover}
+</style>
+<link rel="manifest" href="manifest.webmanifest"><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script><script src="firebase-config.js" defer></script><script src="db.js" defer></script><script src="pwa.js" defer></script></head>
+<body>
+<div class="page">
+
+<div class="page-head">
+<h1>Pick a background style</h1>
+<p>Each preview shows the hero on top and the body area below — where the water effect would appear behind your order cards.</p>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="center">
+<a class="back" href="order.html">← Back to order page</a>
+</div>
+</div>
+
+<script>
+const DROP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/></svg>';
+const CAMPER='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3h8M12 3v2.2M20 3v2.2"/><rect x="13.5" y="5.2" width="5" height="2.2" rx="0.4"/><path d="M8 7.4h16a1.4 1.4 0 0 1 1.4 1.4V26a2 2 0 0 1-2 2H8.6a2 2 0 0 1-2-2V8.8A1.4 1.4 0 0 1 8 7.4z"/><path d="M9 14c1.5-1.2 3-1.2 4.5 0s3 1.2 4.5 0 3-1.2 4.5 0"/><path d="M25.4 22h-4v3.2h4"/></svg>';
+
+const options=[
+ {id:"none",cls:"bg-none",name:"No Background",desc:"Keep it plain and minimal. Clean white/pale-blue body.",current:true},
+ {id:"bubbles",cls:"bg-bubbles",name:"Floating Bubbles",desc:"Scattered bubbles in different sizes — playful and airy, like a fresh glass of water."},
+ {id:"ripples",cls:"bg-ripples",name:"Water Ripples",desc:"Concentric ripple circles, as if a droplet just landed. Calm and refined."},
+ {id:"droplets",cls:"bg-droplets",name:"Droplet Rain",desc:"Small falling water droplets, repeated subtly. Clean water-brand feel."},
+ {id:"waves",cls:"bg-waves",name:"Flowing Waves",desc:"Horizontal wave lines flowing across the page. Suggests movement and freshness."},
+ {id:"blobs",cls:"bg-blobs",name:"Soft Water Blobs",desc:"Blurred blue glows in the corners — modern, premium, very subtle."},
+ {id:"splash",cls:"bg-splash",name:"Water Splash",desc:"Decorative splash shapes with droplets. Bold and brand-forward."},
+ {id:"grid",cls:"bg-grid",name:"Molecule Dots",desc:"Small dotted pattern like water molecules. Clinical, trustworthy, technical."},
+ {id:"topo",cls:"bg-topo",name:"Wave Contours",desc:"Flowing contour lines like a topographic map of water. Elegant and editorial."}
+];
+
+const grid=document.getElementById("grid");
+options.forEach(op=>{
+  const el=document.createElement("div");
+  el.className="tile";
+  el.innerHTML=
+    '<div class="preview '+op.cls+'">'+
+      (op.current?'<span class="badge-cur">Current</span>':'')+
+      '<div class="hero-mock">'+
+        '<div class="logo-mock">'+DROP+'</div>'+
+        '<div class="brand-mock">Crystal Drops</div>'+
+        '<div class="sub-mock">PURE · CHILLED</div>'+
+      '</div>'+
+      '<div class="body-mock">'+
+        '<div class="prod-mock"><div class="pi-mock">'+CAMPER+'</div><div class="pn">Camper</div><div class="pp"><b>₹40</b> / camper</div></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="tile-body">'+
+      '<div class="name">'+op.name+'</div>'+
+      '<div class="desc">'+op.desc+'</div>'+
+      '<div class="actions">'+
+        '<button class="btn btn-ghost" onclick="previewFull(\''+op.id+'\')">Preview</button>'+
+        '<button class="btn btn-primary" onclick="pick(\''+op.id+'\',\''+op.name+'\')">Select</button>'+
+      '</div>'+
+    '</div>';
+  grid.appendChild(el);
+});
+
+function previewFull(id){
+  window.open("order.html?bg="+id,"_blank");
+}
+function pick(id,name){
+  try{localStorage.setItem("cd_bg",id)}catch(e){}
+  alert("Background saved: "+name+"\n\nYour order page now uses this background.");
+  window.location.href="order.html";
+}
+</script>
+<script src="bottombar.js" defer></script>
+</body>
+</html>

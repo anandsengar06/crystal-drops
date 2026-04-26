@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#e0f2fe">
+<title>Crystal Drops — Business Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6fafd;--panel:#fff;--ink:#0b1f3a;--ink2:#475569;--muted:#94a3b8;--line:#e6eef7;--brand:#0284c7;--brand2:#0ea5e9;--brand3:#38bdf8;--brand-dark:#075985;--g:#16a34a;--blob1:#7dd3fc;--blob2:#bae6fd}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;line-height:1.5;position:relative;overflow-x:hidden}
+body::before,body::after{content:"";position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+body::before{width:420px;height:420px;background:var(--blob1);top:-100px;right:-80px;opacity:.32}
+body::after{width:480px;height:480px;background:var(--blob2);bottom:-160px;left:20%;opacity:.4}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+.wrap{max-width:1100px;margin:0 auto;padding:48px 24px 64px;position:relative;z-index:2}
+
+/* HERO */
+.hero{text-align:center;margin-bottom:48px}
+.logo{width:74px;height:74px;margin:0 auto 16px;border-radius:22px;background:linear-gradient(135deg,#38bdf8,#0284c7);display:grid;place-items:center;box-shadow:0 14px 40px rgba(14,165,233,.35)}
+.logo svg{width:38px;height:38px;color:#fff}
+.brand{font-size:42px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;background:linear-gradient(135deg,var(--brand-dark),var(--brand));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tag{font-size:15px;color:var(--ink2);font-weight:500;font-style:italic}
+.brand-sub{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--brand-dark);background:#e0f2fe;padding:6px 14px;border-radius:999px;margin-top:14px;border:1px solid #bae6fd;letter-spacing:.5px}
+.brand-sub .dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 0 4px rgba(34,197,94,.2);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(34,197,94,.2)}50%{box-shadow:0 0 0 7px rgba(34,197,94,.05)}}
+
+/* PRIMARY CARDS */
+.primary{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:36px}
+.pcard{background:var(--panel);border-radius:24px;padding:32px;box-shadow:0 1px 3px rgba(15,27,45,.04),0 18px 50px rgba(15,27,45,.08);border:1px solid rgba(255,255,255,.8);position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column;min-height:280px}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 1px 3px rgba(15,27,45,.04),0 28px 60px rgba(15,27,45,.12)}
+.pcard::after{content:"";position:absolute;top:-40%;right:-20%;width:60%;height:140%;background:radial-gradient(circle,var(--blob2) 0%,transparent 65%);opacity:.4;pointer-events:none}
+.pcard-ico{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--brand2),var(--brand));display:grid;place-items:center;color:#fff;margin-bottom:18px;box-shadow:0 12px 28px rgba(14,165,233,.32);position:relative;z-index:1}
+.pcard-ico svg{width:30px;height:30px}
+.pcard-tag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--brand-dark);background:#e0f2fe;padding:4px 10px;border-radius:999px;margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase;align-self:flex-start;position:relative;z-index:1}
+.pcard h2{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:8px;color:var(--ink);position:relative;z-index:1}
+.pcard p{font-size:14px;color:var(--ink2);line-height:1.55;margin-bottom:20px;position:relative;z-index:1}
+.pcard ul{list-style:none;font-size:13px;color:var(--ink2);margin-bottom:24px;position:relative;z-index:1}
+.pcard ul li{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.pcard ul li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--brand2)}
+.pcard-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;border-radius:12px;font-weight:700;font-size:14px;box-shadow:0 8px 20px rgba(14,165,233,.32);transition:all .15s;align-self:flex-start;margin-top:auto;position:relative;z-index:1}
+.pcard-btn:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(14,165,233,.42)}
+.pcard-btn svg{width:16px;height:16px}
+
+/* SECONDARY GRID */
+.section-title{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 14px 4px}
+.secondary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:36px}
+.scard{background:var(--panel);border-radius:16px;padding:18px;box-shadow:0 1px 2px rgba(15,27,45,.04),0 6px 18px rgba(15,27,45,.05);border:1px solid rgba(255,255,255,.8);transition:all .2s;cursor:pointer;display:flex;flex-direction:column;gap:10px;color:var(--ink)}
+.scard:hover{transform:translateY(-2px);box-shadow:0 1px 2px rgba(15,27,45,.04),0 14px 30px rgba(15,27,45,.1);border-color:var(--brand2)}
+.scard-ico{width:38px;height:38px;border-radius:10px;background:#f0f9ff;display:grid;place-items:center;color:var(--brand-dark)}
+.scard-ico svg{width:18px;height:18px}
+.scard-name{font-weight:700;font-size:13.5px;color:var(--ink);line-height:1.3}
+.scard-d{font-size:11.5px;color:var(--muted);line-height:1.4}
+
+/* QUICK STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.stat{background:var(--panel);border-radius:14px;padding:16px 18px;border:1px solid var(--line)}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px}
+.stat-value{font-size:22px;font-weight:800;color:var(--ink);margin-top:4px;letter-spacing:-.5px}
+.stat-delta{font-size:11.5px;color:var(--g);font-weight:600;margin-top:2px}
+.stat-delta.dn{color:#dc2626}
+
+/* FOOTER */
+.foot{text-align:center;padding-top:30px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.7}
+.foot strong{color:var(--ink2)}
+.foot a{color:var(--brand);font-weight:600}
+
+@media (max-width:760px){
+  .primary{grid-template-columns:1fr}
+  .secondary{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .brand{font-size:34px}
+  .wrap{padding:32px 18px 48px}
+  .pcard{padding:26px;min-height:auto}
+}
+</style>
+<link rel="manifest" href="manifest.webmanifest"><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script><script src="firebase-config.js" defer></script><script src="db.js" defer></script><script src="pwa.js" defer></script></head>
+<body>
+
+<div class="wrap">
+
+<div class="hero">
+<div class="logo">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/></svg>
+</div>
+<h1 class="brand">Crystal Drops</h1>
+<div class="tag">Pure, chilled, at your door</div>
+<div class="brand-sub"><span class="dot"></span> Business Hub · Live</div>
+</div>
+
+<!-- Quick stats preview -->
+<div class="stats">
+<div class="stat"><div class="stat-label">Today's Orders</div><div class="stat-value" id="s-orders">—</div><div class="stat-delta">+12% vs. yesterday</div></div>
+<div class="stat"><div class="stat-label">Revenue Today</div><div class="stat-value" id="s-rev">—</div><div class="stat-delta">+8% vs. yesterday</div></div>
+<div class="stat"><div class="stat-label">Pending Delivery</div><div class="stat-value" id="s-pen">—</div><div class="stat-delta dn">out for delivery</div></div>
+<div class="stat"><div class="stat-label">Active Customers</div><div class="stat-value" id="s-cus">—</div><div class="stat-delta">this month</div></div>
+</div>
+
+<!-- Primary cards -->
+<div class="primary">
+
+<a href="admin.html" class="pcard">
+<div class="pcard-ico">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+</div>
+<div class="pcard-tag">For Owner / Staff</div>
+<h2>Admin Dashboard</h2>
+<p>Run the whole business — orders, customers, inventory, revenue and delivery routes in one place.</p>
+<ul>
+<li>Track every order across QR, phone, WhatsApp and walk-in</li>
+<li>Customer database with dues and lifetime value</li>
+<li>Revenue, expenses and profit margin live</li>
+<li>Camper / Jar stock and delivery staff routes</li>
+</ul>
+<span class="pcard-btn">Open Dashboard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+</a>
+
+<a href="order.html" class="pcard">
+<div class="pcard-ico">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+</div>
+<div class="pcard-tag">For Customers</div>
+<h2>Customer Order Page</h2>
+<p>The page your customers see when they scan the QR — order in 20 seconds, EN / हिंदी toggle, mobile-first.</p>
+<ul>
+<li>Order Camper or Jar (or both) in one go</li>
+<li>UPI / QR or Cash on delivery</li>
+<li>One-tap reorder for repeat customers</li>
+<li>Works in English and Hinglish for rural users</li>
+</ul>
+<span class="pcard-btn">Open Order Page <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+</a>
+
+</div>
+
+<!-- Secondary tools -->
+<div class="section-title">Customise &amp; tools</div>
+<div class="secondary">
+
+<a href="themes.html" class="scard">
+<div class="scard-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.4 0 1.8-1 1.4-2-1-2.4 1-3 2.6-3H19a3 3 0 0 0 3-3c0-6-4.5-10-10-10z"/></svg></div>
+<div class="scard-name">Themes</div>
+<div class="scard-d">Pick from 8 colour themes for the order page.</div>
+</a>
+
+<a href="backgrounds.html" class="scard">
+<div class="scard-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/><circle cx="9" cy="13" r="1"/></svg></div>
+<div class="scard-name">Backgrounds</div>
+<div class="scard-d">Bubbles, ripples, blobs — choose the look.</div>
+</a>
+
+<a href="admin.html#qr" class="scard">
+<div class="scard-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+<div class="scard-name">QR Code</div>
+<div class="scard-d">Print the QR for jars, walls, WhatsApp.</div>
+</a>
+
+<a href="javascript:void(0)" onclick="copyOrderLink();return false" class="scard">
+<div class="scard-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></div>
+<div class="scard-name" id="copyName">Copy Order Link</div>
+<div class="scard-d">Share the order page on WhatsApp / SMS.</div>
+</a>
+
+</div>
+
+<div class="foot">
+<div><strong>Crystal Drops</strong> · RO Purified Drinking Water</div>
+<div style="margin-top:6px">Customer care: <a href="tel:+919810012345">+91 98100 12345</a></div>
+<div style="margin-top:14px;font-size:11.5px;color:var(--muted)">Single-page hub linking your admin dashboard with the customer order page</div>
+</div>
+
+</div>
+
+<script>
+// Mock-up live numbers (these match the demo data in index.html)
+function rand(n){return Math.floor(Math.random()*n)}
+const today = 14 + rand(8);
+const rev = today * (40 + rand(15));
+document.getElementById("s-orders").textContent = today;
+document.getElementById("s-rev").textContent = "₹" + rev.toLocaleString("en-IN");
+document.getElementById("s-pen").textContent = 3 + rand(5);
+document.getElementById("s-cus").textContent = (320 + rand(40));
+
+function copyOrderLink(){
+  const url = location.href.replace(/[^/]*$/, "order.html");
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>{
+      const el = document.getElementById("copyName");
+      const orig = el.textContent;
+      el.textContent = "Copied ✓";
+      setTimeout(()=>el.textContent=orig,1600);
+    });
+  } else {
+    prompt("Copy this link:", url);
+  }
+}
+</script>
+
+<script src="bottombar.js" defer></script>
+</body>
+</html>

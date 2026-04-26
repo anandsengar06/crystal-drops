@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Crystal Drops — Admin Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f6fafd;
+    --panel:#ffffff;
+    --ink:#0b1f3a;
+    --ink-soft:#475569;
+    --muted:#94a3b8;
+    --line:#e6eef7;
+    --brand:#0284c7;
+    --brand2:#0ea5e9;
+    --brand3:#38bdf8;
+    --brand-dark:#075985;
+    --brand-soft:#e0f2fe;
+    --green:#16a34a;
+    --green-soft:#dcfce7;
+    --red:#dc2626;
+    --red-soft:#fee2e2;
+    --amber:#d97706;
+    --amber-soft:#fef3c7;
+    --violet:#7c3aed;
+    --violet-soft:#ede9fe;
+    --blob1:#7dd3fc;
+    --blob2:#bae6fd;
+    --shadow:0 1px 2px rgba(15,27,45,.03), 0 10px 40px rgba(15,27,45,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:14px}
+
+  body{position:relative;overflow-x:hidden}
+  body::before,body::after{content:"";position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+  body::before{width:380px;height:380px;background:var(--blob1);top:-80px;right:-80px;opacity:.28}
+  body::after{width:420px;height:420px;background:var(--blob2);bottom:-120px;left:30%;opacity:.35}
+  .app,.topbar,.content,.sidebar{position:relative;z-index:1}
+
+
+  /* Layout */
+  .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:linear-gradient(180deg,#ffffff 0%,#f0f9ff 100%);color:var(--ink);padding:18px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .brand-logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#38bdf8,#0284c7);display:grid;place-items:center;box-shadow:0 8px 20px rgba(14,165,233,.35)}
+  .brand-logo svg{width:20px;height:20px;color:#fff}
+  .brand-name{font-weight:800;font-size:15.5px;letter-spacing:-.2px;color:var(--ink)}
+  .brand-sub{font-size:11px;color:var(--muted);font-weight:500}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--ink-soft);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .15s}
+  .nav-item:hover{background:#f0f9ff;color:var(--brand-dark)}
+  .nav-item.active{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);color:var(--brand-dark);box-shadow:inset 3px 0 0 var(--brand2),0 4px 14px rgba(14,165,233,.1)}
+  .nav-item svg{width:16px;height:16px;opacity:.9}
+  .nav-section{font-size:10.5px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin:20px 8px 6px;font-weight:700}
+
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 28px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:20}
+  .page-title{font-size:18px;font-weight:700;margin:0}
+  .page-sub{font-size:12px;color:var(--muted);margin:2px 0 0}
+  .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .search{display:flex;align-items:center;gap:8px;background:#f1f5fb;border:1.5px solid var(--line);padding:8px 14px;border-radius:10px;width:280px;transition:all .15s}
+  .search input{border:none;background:transparent;outline:none;flex:1;font-size:13.5px;color:var(--ink)}
+  .search:focus-within{border-color:var(--brand2);background:#fff;box-shadow:0 0 0 4px rgba(14,165,233,.1)}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;transition:all .15s;border:1px solid transparent}
+  .btn-primary{background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;box-shadow:0 6px 16px rgba(14,165,233,.3)}
+  .btn-primary:hover{background:linear-gradient(135deg,var(--brand),var(--brand-dark));transform:translateY(-1px);box-shadow:0 8px 20px rgba(14,165,233,.4)}
+  .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{background:#f8fafc}
+
+  .content{padding:22px 24px;max-width:1400px;width:100%}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  /* Auth pill in topbar */
+  .auth-pill{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:999px;background:#f1f5fb;border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--ink-soft);transition:all .15s}
+  .auth-pill .av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#38bdf8,#0284c7);display:grid;place-items:center;color:#fff;font-weight:700;font-size:11px;flex-shrink:0}
+  .auth-pill .av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+  .auth-pill .a-sub{font-size:10.5px;color:var(--muted);font-weight:500}
+  .auth-pill button{margin-left:4px;padding:4px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink-soft);font-size:11.5px;font-weight:600;cursor:pointer}
+  .auth-pill button:hover{background:#f0f9ff;color:var(--brand-dark);border-color:var(--brand-soft)}
+  .auth-pill.signed-in{background:#f0fdf4;border-color:#bbf7d0}
+  .auth-pill.signed-in .av{background:linear-gradient(135deg,#22c55e,#16a34a)}
+  /* Live orders banner */
+  .live-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #bbf7d0;border-radius:16px;padding:14px 18px;margin-bottom:18px}
+  .live-dot{width:10px;height:10px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.18);animation:livepulse 1.6s ease-in-out infinite}
+  @keyframes livepulse{0%,100%{box-shadow:0 0 0 4px rgba(22,163,74,.18)}50%{box-shadow:0 0 0 8px rgba(22,163,74,.05)}}
+  .live-text{flex:1;font-size:13px;color:#166534;font-weight:600}
+  .live-text strong{color:#0b1f3a}
+  .live-cnt{font-weight:800;color:#15803d;font-variant-numeric:tabular-nums}
+
+
+  /* KPI cards */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--panel);border-radius:16px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.8)}
+  .kpi-label{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+  .kpi-value{font-size:24px;font-weight:700;margin-top:6px;color:var(--ink)}
+  .kpi-delta{font-size:12px;margin-top:6px;display:flex;align-items:center;gap:4px}
+  .kpi-delta.up{color:var(--green)}
+  .kpi-delta.down{color:var(--red)}
+  .kpi-icon{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:9px;display:grid;place-items:center}
+  .kpi-icon svg{width:18px;height:18px}
+
+  /* Cards */
+  .card{background:var(--panel);border-radius:16px;box-shadow:var(--shadow);padding:20px;margin-bottom:18px;border:1px solid rgba(255,255,255,.8)}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .card-title{font-size:15px;font-weight:700;margin:0}
+  .card-sub{font-size:12px;color:var(--muted);margin:2px 0 0}
+
+  .grid-2{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  .grid-2-eq{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line);background:#f9fbfd}
+  td{padding:12px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink)}
+  tr:hover td{background:#fafcfe}
+  tbody tr:last-child td{border-bottom:none}
+
+  /* Badges */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600}
+  .b-green{background:var(--green-soft);color:#166534}
+  .b-red{background:var(--red-soft);color:#991b1b}
+  .b-amber{background:var(--amber-soft);color:#92400e}
+  .b-blue{background:var(--brand-soft);color:#075985}
+  .b-violet{background:var(--violet-soft);color:#5b21b6}
+  .b-gray{background:#f1f5f9;color:#475569}
+  .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+
+  /* Filters */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .chip{padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;transition:all .15s}
+  .chip:hover{border-color:var(--brand)}
+  .chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .select{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--ink);outline:none}
+  .select:focus{border-color:var(--brand)}
+
+  /* Channel icons */
+  .channel{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+  .channel-icon{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;color:#fff}
+  .channel-icon svg{width:12px;height:12px}
+  .c-qr{background:#0ea5e9}
+  .c-phone{background:#8b5cf6}
+  .c-wa{background:#22c55e}
+  .c-walkin{background:#f59e0b}
+
+  /* Avatar */
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#60a5fa,#0ea5e9);color:#fff;font-weight:700;font-size:12px;display:inline-grid;place-items:center;margin-right:8px;vertical-align:middle}
+
+  /* Progress */
+  .progress{height:6px;background:#eef2f7;border-radius:999px;overflow:hidden}
+  .progress-bar{height:100%;background:linear-gradient(90deg,#0ea5e9,#22d3ee);border-radius:999px;transition:width .3s}
+
+  /* Modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(2px)}
+  .modal-bg.show{display:flex;animation:fadeIn .15s}
+  .modal{background:#fff;border-radius:14px;padding:22px;width:420px;max-width:92vw;box-shadow:0 20px 60px rgba(15,27,45,.25)}
+  .modal h3{margin:0 0 14px;font-size:16px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+  .field input,.field select,.field textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;outline:none;font-size:13px}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand)}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+
+  /* Charts */
+  .chart-wrap{position:relative;height:260px}
+
+  /* Misc */
+  .flex{display:flex;align-items:center;gap:8px}
+  .spacer{flex:1}
+  .muted{color:var(--muted)}
+  .mono{font-variant-numeric:tabular-nums}
+  .right{text-align:right}
+  .hint{font-size:12px;color:var(--muted);background:#f8fafc;border:1px dashed var(--line);border-radius:10px;padding:12px}
+  .stack{display:flex;flex-direction:column;gap:4px}
+  .ttl{font-weight:600}
+  .sep{height:1px;background:var(--line);margin:10px 0}
+  .qr-card{display:flex;align-items:center;gap:14px;padding:14px;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-radius:12px;border:1px solid #bae6fd}
+  .qr-box{width:110px;height:110px;background:#fff;border:1px solid #bae6fd;border-radius:10px;display:grid;place-items:center;padding:6px}
+  .qr-box img{width:100%;height:100%}
+
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr}
+    .sidebar{display:none}
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.grid-2-eq{grid-template-columns:1fr}
+  }
+</style>
+<link rel="manifest" href="manifest.webmanifest"><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script><script src="firebase-config.js" defer></script><script src="db.js" defer></script><script src="pwa.js" defer></script></head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.5s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Crystal Drops</div>
+        <div class="brand-sub">RO Water · Admin</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-item active" data-page="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" data-page="orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Orders
+      </div>
+      <div class="nav-item" data-page="customers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Customers
+      </div>
+      <div class="nav-item" data-page="revenue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Revenue &amp; Profit
+      </div>
+      <div class="nav-item" data-page="inventory">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 7.3 12 12 3.5 7.3"/><path d="M12 22V12"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Inventory
+      </div>
+      <div class="nav-item" data-page="payments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Payments &amp; Dues
+      </div>
+      <div class="nav-item" data-page="delivery">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Delivery
+      </div>
+
+      <div class="nav-section">Tools</div>
+      <div class="nav-item" data-page="qr">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        QR Code for Orders
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:14px 12px;font-size:11.5px;color:var(--ink-soft);line-height:1.5;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:12px">
+      <div style="font-weight:700;color:var(--brand-dark);margin-bottom:4px;display:flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21h6M12 17v4M12 3a7 7 0 0 1 4 12.7V17H8v-1.3A7 7 0 0 1 12 3z"/></svg>Tip</div>
+      Print the QR code and stick it on delivered jars — customers can scan to reorder in seconds.
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title" id="topTitle">Overview</h1>
+        <p class="page-sub" id="topSub">Today's business snapshot</p>
+      </div>
+      <div class="topbar-actions">
+        <div class="auth-pill" id="authPill"><div class="av" id="authAv">G</div><div><div id="authName">Not signed in</div><div class="a-sub" id="authSub">Demo mode</div></div><button id="authBtn" type="button">Sign in</button></div>
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="globalSearch" placeholder="Search customer, phone, order…"/>
+        </div>
+        <button class="btn btn-primary" id="newOrderBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Order
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- OVERVIEW -->
+      <section class="page active" id="page-overview">
+        <div class="live-banner" id="liveBanner" style="display:none">
+          <div class="live-dot"></div>
+          <div class="live-text"><strong id="liveCount">0 new orders</strong> from customers via QR / app — live from Firestore</div>
+          <button class="btn btn-ghost" onclick="go('orders')">View all</button>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="kpi-label">Today's Orders</div>
+            <div class="kpi-value" id="kpiOrders">—</div>
+            <div class="kpi-delta up">▲ <span id="kpiOrdersDelta">+12%</span> vs. yesterday</div>
+            <div class="kpi-icon" style="background:var(--brand-soft);color:var(--brand-dark)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Revenue Today</div>
+            <div class="kpi-value mono" id="kpiRevenue">—</div>
+            <div class="kpi-delta up">▲ <span id="kpiRevenueDelta">+8%</span> vs. yesterday</div>
+            <div class="kpi-icon" style="background:var(--green-soft);color:#166534">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Pending Delivery</div>
+            <div class="kpi-value" id="kpiPending">—</div>
+            <div class="kpi-delta down">● <span id="kpiPendingSub">out for delivery</span></div>
+            <div class="kpi-icon" style="background:var(--amber-soft);color:#92400e">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Outstanding Dues</div>
+            <div class="kpi-value mono" id="kpiDues">—</div>
+            <div class="kpi-delta down">▼ <span id="kpiDuesSub">across 14 customers</span></div>
+            <div class="kpi-icon" style="background:var(--red-soft);color:#991b1b">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title">Orders &amp; Revenue — Last 14 days</h3>
+                <p class="card-sub">Daily volume and value trend</p>
+              </div>
+              <select class="select" id="rangeSelect">
+                <option value="14">Last 14 days</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+              </select>
+            </div>
+            <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3 class="card-title">Order Channels</h3>
+              <span class="muted" style="font-size:11px">Today</span>
+            </div>
+            <div class="chart-wrap"><canvas id="channelChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h3 class="card-title">Recent Orders</h3>
+              <button class="btn btn-ghost" onclick="go('orders')">View all</button>
+            </div>
+            <table>
+              <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Channel</th><th class="right">Amount</th><th>Status</th></tr></thead>
+              <tbody id="recentOrdersBody"></tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3 class="card-title">Top Customers</h3>
+              <span class="muted" style="font-size:11px">This month</span>
+            </div>
+            <div id="topCustomersList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="page" id="page-orders">
+        <div class="filters">
+          <div class="chip active" data-status="all">All</div>
+          <div class="chip" data-status="new">New</div>
+          <div class="chip" data-status="out">Out for Delivery</div>
+          <div class="chip" data-status="delivered">Delivered</div>
+          <div class="chip" data-status="cancelled">Cancelled</div>
+          <div class="spacer"></div>
+          <select class="select" id="channelFilter">
+            <option value="all">All channels</option>
+            <option value="qr">QR Code</option>
+            <option value="phone">Phone Call</option>
+            <option value="whatsapp">WhatsApp / SMS</option>
+            <option value="walkin">Walk-in</option>
+          </select>
+        </div>
+        <div class="card" style="padding:0">
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Time</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Channel</th>
+                <th class="right">Amount</th>
+                <th>Payment</th>
+                <th>Delivery</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CUSTOMERS -->
+      <section class="page" id="page-customers">
+        <div class="filters">
+          <input class="select" id="custSearch" placeholder="Search by name, phone, area…" style="width:280px"/>
+          <select class="select" id="custArea">
+            <option value="all">All areas</option>
+          </select>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" onclick="openAddCustomer()">+ Add Customer</button>
+        </div>
+        <div class="card" style="padding:0">
+          <table>
+            <thead><tr><th>Customer</th><th>Phone</th><th>Area</th><th>Plan</th><th class="right">Orders</th><th class="right">Spent</th><th class="right">Dues</th><th>Last order</th></tr></thead>
+            <tbody id="customersBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- REVENUE -->
+      <section class="page" id="page-revenue">
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="kpi-label">Revenue — This Month</div>
+            <div class="kpi-value mono" id="revMonth">—</div>
+            <div class="kpi-delta up">▲ 14% vs. last month</div>
+            <div class="kpi-icon" style="background:var(--green-soft);color:#166534">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Total Sales (units)</div>
+            <div class="kpi-value" id="salesMonth">—</div>
+            <div class="kpi-delta up">▲ jars &amp; bottles delivered</div>
+            <div class="kpi-icon" style="background:var(--brand-soft);color:var(--brand-dark)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Expenses</div>
+            <div class="kpi-value mono" id="expMonth">—</div>
+            <div class="kpi-delta down">● electricity, salary, jars, maintenance</div>
+            <div class="kpi-icon" style="background:var(--red-soft);color:#991b1b">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Net Profit</div>
+            <div class="kpi-value mono" id="profitMonth" style="color:#16a34a">—</div>
+            <div class="kpi-delta up">▲ <span id="profitMargin">—</span> profit margin</div>
+            <div class="kpi-icon" style="background:var(--violet-soft);color:#5b21b6">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title">Revenue vs. Expense vs. Profit</h3>
+                <p class="card-sub">Last 6 months</p>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="profitChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3 class="card-title">Revenue by Product</h3>
+              <span class="muted" style="font-size:11px">This month</span>
+            </div>
+            <div class="chart-wrap"><canvas id="productChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid-2-eq">
+          <div class="card">
+            <div class="card-head">
+              <h3 class="card-title">Expense Breakdown — This Month</h3>
+            </div>
+            <table>
+              <thead><tr><th>Category</th><th class="right">Amount</th><th class="right">% of Revenue</th></tr></thead>
+              <tbody id="expenseBody"></tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3 class="card-title">Product Sales — This Month</h3>
+            </div>
+            <table>
+              <thead><tr><th>Product</th><th class="right">Units</th><th class="right">Revenue</th><th class="right">Profit/unit</th></tr></thead>
+              <tbody id="productBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- INVENTORY -->
+      <section class="page" id="page-inventory">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">Filled Campers</div><div class="kpi-value" id="invFilled">—</div><div class="kpi-delta up">chilled · ready to dispatch</div></div>
+          <div class="kpi"><div class="kpi-label">Empty Campers (plant)</div><div class="kpi-value" id="invEmpty">—</div><div class="kpi-delta muted">to be refilled</div></div>
+          <div class="kpi"><div class="kpi-label">Campers with Customers</div><div class="kpi-value" id="invOut">—</div><div class="kpi-delta muted">awaiting return</div></div>
+          <div class="kpi"><div class="kpi-label">Jars Filled</div><div class="kpi-value" id="invBottles">—</div><div class="kpi-delta muted">normal · ready to dispatch</div></div>
+        </div>
+
+        <div class="grid-2-eq">
+          <div class="card">
+            <div class="card-head"><h3 class="card-title">Daily Production</h3><span class="muted" style="font-size:11px">Filled campers per day · last 7d</span></div>
+            <div class="chart-wrap"><canvas id="productionChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3 class="card-title">Stock Movement — Today</h3></div>
+            <table>
+              <thead><tr><th>Item</th><th class="right">Opening</th><th class="right">In</th><th class="right">Out</th><th class="right">Closing</th></tr></thead>
+              <tbody id="stockBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3 class="card-title">Campers with Customers (pending return)</h3></div>
+          <table>
+            <thead><tr><th>Customer</th><th>Phone</th><th class="right">Campers out</th><th class="right">Deposit held</th><th>Oldest out since</th></tr></thead>
+            <tbody id="jarsOutBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PAYMENTS -->
+      <section class="page" id="page-payments">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">Collected — This month</div><div class="kpi-value mono" id="payCollected">—</div><div class="kpi-delta up">cash + UPI</div></div>
+          <div class="kpi"><div class="kpi-label">Outstanding Dues</div><div class="kpi-value mono" id="payDues">—</div><div class="kpi-delta down">across customers</div></div>
+          <div class="kpi"><div class="kpi-label">UPI Share</div><div class="kpi-value" id="payUpi">—</div><div class="kpi-delta muted">of collected</div></div>
+          <div class="kpi"><div class="kpi-label">Avg. Days to Pay</div><div class="kpi-value" id="payDays">—</div><div class="kpi-delta muted">from invoice</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3 class="card-title">Outstanding Dues</h3>
+            <div class="filters" style="margin:0">
+              <div class="chip active" data-due="all">All</div>
+              <div class="chip" data-due="0-7">0–7 days</div>
+              <div class="chip" data-due="7-30">7–30 days</div>
+              <div class="chip" data-due="30+">30+ days</div>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Customer</th><th>Phone</th><th class="right">Dues</th><th class="right">Last paid</th><th>Days overdue</th><th></th></tr></thead>
+            <tbody id="duesBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3 class="card-title">Recent Payments</h3></div>
+          <table>
+            <thead><tr><th>Date</th><th>Customer</th><th>Method</th><th class="right">Amount</th><th>Reference</th></tr></thead>
+            <tbody id="paymentsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- DELIVERY -->
+      <section class="page" id="page-delivery">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">Staff On Duty</div><div class="kpi-value" id="delStaff">—</div><div class="kpi-delta up">all active</div></div>
+          <div class="kpi"><div class="kpi-label">Orders Assigned</div><div class="kpi-value" id="delAssigned">—</div><div class="kpi-delta muted">today</div></div>
+          <div class="kpi"><div class="kpi-label">Delivered Today</div><div class="kpi-value" id="delDone">—</div><div class="kpi-delta up">completed</div></div>
+          <div class="kpi"><div class="kpi-label">Avg. Delivery Time</div><div class="kpi-value" id="delAvg">—</div><div class="kpi-delta muted">from order</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3 class="card-title">Delivery Staff</h3></div>
+          <table>
+            <thead><tr><th>Staff</th><th>Phone</th><th>Route</th><th>Vehicle</th><th class="right">Assigned</th><th class="right">Delivered</th><th>Status</th></tr></thead>
+            <tbody id="staffBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3 class="card-title">Today's Routes</h3></div>
+          <div id="routesList"></div>
+        </div>
+      </section>
+
+      <!-- QR PAGE -->
+      <section class="page" id="page-qr">
+        <div class="card">
+          <div class="card-head"><h3 class="card-title">QR Code — Customer Self-Order</h3></div>
+          <p class="muted" style="margin-top:-6px">Print this QR on jar stickers, shop walls, or WhatsApp it to customers. When scanned, it opens your customer-facing order page where customers can place an order in 20 seconds.</p>
+          <div class="qr-card" style="margin-top:10px">
+            <div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https%3A%2F%2Fcrystaldrops.example%2Forder.html&margin=1" alt="QR code"/></div>
+            <div>
+              <div class="ttl">Customer Order Page</div>
+              <div class="muted" style="font-size:12.5px;margin:4px 0 10px">order.html (open in a separate tab to preview)</div>
+              <a class="btn btn-primary" href="order.html" target="_blank" rel="noopener">Open Order Page</a>
+              <button class="btn btn-ghost" onclick="window.print()" style="margin-left:6px">Print QR</button>
+            </div>
+          </div>
+          <div class="sep"></div>
+          <div class="hint">
+            <strong>How it works</strong> — Customer scans the QR with their phone camera, picks items (Camper, Jar) with quantities, enters name + phone + address, and hits submit. The order appears here in the Orders tab with a "QR" channel tag. You can also stick one QR on every jar delivered, so reordering is one scan away.
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal-bg" id="addCustomerModal">
+  <div class="modal">
+    <h3>Add Customer</h3>
+    <div class="field"><label>Full Name</label><input id="nc_name" placeholder="e.g. Ramesh Kumar"/></div>
+    <div class="field"><label>Phone</label><input id="nc_phone" placeholder="+91 9xxxxxxxxx"/></div>
+    <div class="field"><label>Area</label><input id="nc_area" placeholder="e.g. Sector 12, Karol Bagh"/></div>
+    <div class="field"><label>Address</label><textarea id="nc_address" rows="2" placeholder="Full delivery address"></textarea></div>
+    <div class="field"><label>Plan</label>
+      <select id="nc_plan">
+        <option>Pay per order</option>
+        <option>Monthly — 30 jars</option>
+        <option>Monthly — 60 jars</option>
+        <option>Office / Bulk</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addCustomerModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Order Modal -->
+<div class="modal-bg" id="newOrderModal">
+  <div class="modal">
+    <h3>New Order</h3>
+    <div class="field"><label>Customer</label>
+      <select id="no_cust"></select>
+    </div>
+    <div class="field"><label>Product</label>
+      <select id="no_prod">
+        <option value="camper20|40">Camper (Chilled) — ₹40</option>
+        <option value="jar|35">Jar (Normal) — ₹35</option>
+      </select>
+    </div>
+    <div class="field"><label>Quantity</label><input id="no_qty" type="number" value="1" min="1"/></div>
+    <div class="field"><label>Channel</label>
+      <select id="no_chan">
+        <option value="phone">Phone Call</option>
+        <option value="qr">QR Code</option>
+        <option value="whatsapp">WhatsApp / SMS</option>
+        <option value="walkin">Walk-in</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('newOrderModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveOrder()">Place Order</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= MOCK DATA ================= */
+const areas = ["Sector 12","Karol Bagh","Model Town","Greenfield","Civil Lines","Gandhi Nagar","MG Road","Sector 28","Park View","Riverside"];
+const firstNames=["Ramesh","Sunita","Anil","Priya","Rakesh","Meena","Vikram","Asha","Rajeev","Pooja","Manish","Sneha","Deepak","Kavita","Sunil","Neha","Rohit","Shalini","Arun","Divya","Ajay","Shruti","Sandeep","Preeti","Gaurav","Swati","Naveen","Rekha","Harish","Kiran"];
+const lastNames=["Kumar","Sharma","Verma","Singh","Gupta","Patel","Yadav","Jain","Malhotra","Bansal","Mishra","Nair","Reddy","Kapoor","Joshi"];
+const plans=["Pay per order","Monthly — 30 jars","Monthly — 60 jars","Office / Bulk"];
+const channels=[{k:"qr",l:"QR Code",cls:"c-qr"},{k:"phone",l:"Phone",cls:"c-phone"},{k:"whatsapp",l:"WhatsApp",cls:"c-wa"},{k:"walkin",l:"Walk-in",cls:"c-walkin"}];
+const products=[
+  {k:"camper20",l:"Camper",desc:"Chilled water / Thanda Pani",price:40,cost:18},
+  {k:"jar",l:"Jar",desc:"Normal water / Chilled for 4 hours",price:35,cost:13}
+];
+const statuses=["delivered","delivered","delivered","delivered","out","new","cancelled"];
+
+function rand(n){return Math.floor(Math.random()*n)}
+function pick(a){return a[rand(a.length)]}
+function money(n){return "₹" + n.toLocaleString("en-IN")}
+
+/* customers */
+let nextCustId = 1001;
+const customers = Array.from({length:32}, (_,i)=>{
+  const name = `${pick(firstNames)} ${pick(lastNames)}`;
+  const area = pick(areas);
+  return {
+    id: ++nextCustId,
+    name,
+    phone: `+91 ${90000+rand(9999)} ${10000+rand(89999)}`.replace(/\s(\d{5})\s/,' $1'),
+    area,
+    address: `H.No. ${1+rand(220)}, ${area}`,
+    plan: pick(plans),
+    orders: 0, spent:0, dues:0, last:null
+  };
+});
+
+/* orders — build 180 over last 14 days */
+let nextOrderId = 50000;
+const now = new Date();
+const orders = [];
+for(let d=13; d>=0; d--){
+  const day = new Date(now); day.setDate(day.getDate()-d); day.setHours(8,0,0,0);
+  const count = 10 + rand(10); // 10-19 orders/day
+  for(let i=0;i<count;i++){
+    const cust = pick(customers);
+    const prod = pick(products);
+    const qty = 1 + rand(prod.k==="camper20"?4:6);
+    const amount = prod.price * qty;
+    const ch = pick(channels);
+    const t = new Date(day); t.setHours(8+rand(12), rand(60));
+    let st;
+    if(d===0) st = pick(["new","new","out","out","delivered","delivered","delivered"]);
+    else st = pick(["delivered","delivered","delivered","delivered","delivered","cancelled"]);
+    const paid = st==="delivered" ? (Math.random()<0.8) : (st==="cancelled"?false:Math.random()<0.3);
+    orders.push({
+      id: ++nextOrderId,
+      t,
+      customer: cust,
+      product: prod, qty, amount,
+      channel: ch.k,
+      status: st,
+      paid,
+      method: paid ? pick(["UPI","UPI","UPI","Cash","Cash"]) : null,
+      staff: null
+    });
+    cust.orders++;
+    if(st!=="cancelled") cust.spent += amount;
+    if(!paid && st!=="cancelled") cust.dues += amount;
+    cust.last = t;
+  }
+}
+orders.sort((a,b)=>b.t - a.t);
+
+/* staff */
+const staff = [
+  {id:1,name:"Ravi Yadav",phone:"+91 98111 22233",route:"North — Sector 12, Civil Lines",vehicle:"Tata Ace · DL-01-AB-1234",status:"on-duty"},
+  {id:2,name:"Suresh Pawar",phone:"+91 97111 88000",route:"West — Karol Bagh, MG Road",vehicle:"Bajaj 3W · DL-02-CX-9911",status:"on-duty"},
+  {id:3,name:"Imran Khan",phone:"+91 98222 55111",route:"South — Park View, Greenfield",vehicle:"Tata Ace · DL-03-HD-7788",status:"on-duty"},
+  {id:4,name:"Vikas Rawat",phone:"+91 98333 11009",route:"East — Gandhi Nagar, Riverside",vehicle:"Bajaj 3W · DL-04-JK-5502",status:"break"}
+];
+
+/* assign staff to today's orders */
+const today = new Date(); today.setHours(0,0,0,0);
+orders.forEach(o=>{
+  if(o.t >= today && o.status!=="cancelled"){
+    o.staff = staff[rand(staff.length)];
+  }
+});
+
+/* expenses this month */
+const expenses = [
+  {cat:"Electricity (plant)", amount:18500},
+  {cat:"Staff salary (4 staff)", amount:62000},
+  {cat:"Vehicle fuel & maintenance", amount:14200},
+  {cat:"Jar purchases / replacement", amount:7800},
+  {cat:"RO membrane & filters", amount:4800},
+  {cat:"Rent", amount:22000},
+  {cat:"Misc (stickers, caps, packaging)", amount:3600}
+];
+const totalExpense = expenses.reduce((s,e)=>s+e.amount,0);
+
+/* ============ COMPUTED ============ */
+const todayOrders = orders.filter(o=>o.t>=today);
+const todayRevenue = todayOrders.filter(o=>o.status!=="cancelled").reduce((s,o)=>s+o.amount,0);
+const yesterdayStart = new Date(today); yesterdayStart.setDate(yesterdayStart.getDate()-1);
+const yesterdayOrders = orders.filter(o=>o.t>=yesterdayStart && o.t<today);
+const pending = orders.filter(o=>o.status==="new"||o.status==="out").length;
+const totalDues = customers.reduce((s,c)=>s+c.dues,0);
+
+/* ============ NAV ============ */
+document.querySelectorAll(".nav-item").forEach(el=>{
+  el.addEventListener("click",()=>go(el.dataset.page));
+});
+function go(page){
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.toggle("active",n.dataset.page===page));
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===`page-${page}`));
+  const titles = {overview:["Overview","Today's business snapshot"],orders:["Orders","All orders across channels"],customers:["Customers","Your customer database"],revenue:["Revenue & Profit","Sales, expenses, and profitability"],inventory:["Inventory","Jars, bottles and production"],payments:["Payments & Dues","Collections and outstanding balances"],delivery:["Delivery","Staff, routes and deliveries"],qr:["QR Code","Customer self-order"]};
+  const t = titles[page]||[""];
+  document.getElementById("topTitle").textContent = t[0];
+  document.getElementById("topSub").textContent = t[1]||"";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ============ RENDER OVERVIEW ============ */
+function channelBadge(k){
+  const c = channels.find(x=>x.k===k);
+  const icons = {
+    qr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+    phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    whatsapp:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.3c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.2-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.4.1-.2 0-.3 0-.5-.1-.1-.6-1.5-.9-2-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.4.1-.7.4-.3.3-.9.9-.9 2.2 0 1.3 1 2.6 1.1 2.8.1.1 1.9 2.9 4.6 4.1 1.7.7 2.4.8 3.3.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2z"/></svg>',
+    walkin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="13" cy="4" r="2"/><path d="m6 20 3-5 2-3 3 2 5-3"/><path d="M14 15l2 5"/></svg>'
+  };
+  return `<span class="channel"><span class="channel-icon ${c.cls}">${icons[k]}</span>${c.l}</span>`;
+}
+function statusBadge(s){
+  if(s==="new") return '<span class="badge b-blue"><span class="dot" style="background:#0ea5e9"></span>New</span>';
+  if(s==="out") return '<span class="badge b-amber"><span class="dot" style="background:#d97706"></span>Out for delivery</span>';
+  if(s==="delivered") return '<span class="badge b-green"><span class="dot" style="background:#16a34a"></span>Delivered</span>';
+  if(s==="cancelled") return '<span class="badge b-red"><span class="dot" style="background:#dc2626"></span>Cancelled</span>';
+}
+function payBadge(o){
+  if(o.status==="cancelled") return '<span class="badge b-gray">—</span>';
+  return o.paid ? `<span class="badge b-green">Paid · ${o.method}</span>` : '<span class="badge b-red">Unpaid</span>';
+}
+function initials(name){return name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase()}
+function timeShort(d){
+  const diff = (Date.now() - d.getTime())/60000;
+  if(diff<1) return "just now";
+  if(diff<60) return Math.round(diff)+" min ago";
+  if(diff<1440) return Math.round(diff/60)+" hr ago";
+  return d.toLocaleDateString("en-IN",{day:"numeric",month:"short"}) + " " + d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+}
+
+function renderOverview(){
+  document.getElementById("kpiOrders").textContent = todayOrders.length;
+  document.getElementById("kpiRevenue").textContent = money(todayRevenue);
+  document.getElementById("kpiPending").textContent = pending;
+  document.getElementById("kpiDues").textContent = money(totalDues);
+
+  // Recent orders
+  const body = document.getElementById("recentOrdersBody");
+  body.innerHTML = orders.slice(0,7).map(o=>`
+    <tr>
+      <td><span class="mono">#${o.id}</span></td>
+      <td><span class="avatar">${initials(o.customer.name)}</span>${o.customer.name}</td>
+      <td>${o.qty} × ${o.product.l}</td>
+      <td>${channelBadge(o.channel)}</td>
+      <td class="right mono">${money(o.amount)}</td>
+      <td>${statusBadge(o.status)}</td>
+    </tr>`).join("");
+
+  // Top customers
+  const top = [...customers].sort((a,b)=>b.spent-a.spent).slice(0,6);
+  const maxSpent = top[0].spent;
+  document.getElementById("topCustomersList").innerHTML = top.map(c=>`
+    <div style="margin-bottom:12px">
+      <div class="flex" style="justify-content:space-between;margin-bottom:4px">
+        <div class="flex"><span class="avatar">${initials(c.name)}</span><div class="stack"><span class="ttl" style="font-size:13px">${c.name}</span><span class="muted" style="font-size:11.5px">${c.area} · ${c.orders} orders</span></div></div>
+        <span class="mono ttl">${money(c.spent)}</span>
+      </div>
+      <div class="progress"><div class="progress-bar" style="width:${Math.round(c.spent/maxSpent*100)}%"></div></div>
+    </div>
+  `).join("");
+
+  renderTrendChart();
+  renderChannelChart();
+}
+
+/* ============ CHARTS ============ */
+let trendChart, channelChart, profitChart, productChart, productionChart;
+function renderTrendChart(){
+  const days = parseInt(document.getElementById("rangeSelect")?.value||"14");
+  const labels = [], ordersData = [], revData = [];
+  for(let d=days-1;d>=0;d--){
+    const dStart = new Date(today); dStart.setDate(dStart.getDate()-d);
+    const dEnd = new Date(dStart); dEnd.setDate(dEnd.getDate()+1);
+    const dayOrders = orders.filter(o=>o.t>=dStart && o.t<dEnd && o.status!=="cancelled");
+    labels.push(dStart.toLocaleDateString("en-IN",{day:"numeric",month:"short"}));
+    ordersData.push(dayOrders.length);
+    revData.push(dayOrders.reduce((s,o)=>s+o.amount,0));
+  }
+  if(trendChart) trendChart.destroy();
+  const ctx = document.getElementById("trendChart");
+  trendChart = new Chart(ctx,{
+    type:"line",
+    data:{labels,datasets:[
+      {label:"Revenue (₹)",data:revData,borderColor:"#0ea5e9",backgroundColor:"rgba(14,165,233,.12)",fill:true,tension:.35,yAxisID:"y",pointRadius:3,pointBackgroundColor:"#0ea5e9"},
+      {label:"Orders",data:ordersData,borderColor:"#8b5cf6",backgroundColor:"rgba(139,92,246,.0)",tension:.35,yAxisID:"y1",pointRadius:3,pointBackgroundColor:"#8b5cf6"}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:"index",intersect:false},
+      plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",padding:14,font:{size:11}}}},
+      scales:{
+        y:{beginAtZero:true,ticks:{callback:v=>"₹"+v,font:{size:11}},grid:{color:"#eef2f7"}},
+        y1:{beginAtZero:true,position:"right",grid:{display:false},ticks:{font:{size:11}}},
+        x:{grid:{display:false},ticks:{font:{size:11}}}
+      }
+    }
+  });
+}
+function renderChannelChart(){
+  const counts = {};
+  todayOrders.filter(o=>o.status!=="cancelled").forEach(o=>counts[o.channel]=(counts[o.channel]||0)+1);
+  const labels=["QR Code","Phone","WhatsApp","Walk-in"];
+  const keys=["qr","phone","whatsapp","walkin"];
+  const data = keys.map(k=>counts[k]||0);
+  if(channelChart) channelChart.destroy();
+  channelChart = new Chart(document.getElementById("channelChart"),{
+    type:"doughnut",
+    data:{labels,datasets:[{data,backgroundColor:["#0ea5e9","#8b5cf6","#22c55e","#f59e0b"],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:"65%",plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",padding:14,font:{size:11}}}}}
+  });
+}
+function renderProfitChart(){
+  // 6 months of data (mock trend)
+  const months = [];
+  const revArr=[], expArr=[], profArr=[];
+  const base = 165000;
+  for(let i=5;i>=0;i--){
+    const d = new Date(today); d.setMonth(d.getMonth()-i);
+    months.push(d.toLocaleDateString("en-IN",{month:"short"}));
+    const r = base + (5-i)*12000 + rand(15000);
+    const e = totalExpense - 8000 + rand(16000) - (5-i)*1500;
+    revArr.push(r); expArr.push(e); profArr.push(r-e);
+  }
+  // Override last with real figures
+  const realRev = orders.filter(o=>o.status!=="cancelled" && o.t.getMonth()===today.getMonth()).reduce((s,o)=>s+o.amount,0);
+  revArr[5] = Math.max(realRev, revArr[5]);
+  expArr[5] = totalExpense;
+  profArr[5] = revArr[5] - expArr[5];
+  if(profitChart) profitChart.destroy();
+  profitChart = new Chart(document.getElementById("profitChart"),{
+    type:"bar",
+    data:{labels:months,datasets:[
+      {label:"Revenue",data:revArr,backgroundColor:"#0ea5e9",borderRadius:6},
+      {label:"Expense",data:expArr,backgroundColor:"#f87171",borderRadius:6},
+      {label:"Profit",data:profArr,backgroundColor:"#22c55e",borderRadius:6}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",padding:14,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>"₹"+(v/1000)+"k",font:{size:11}},grid:{color:"#eef2f7"}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+}
+function renderProductChart(){
+  const map = {};
+  orders.filter(o=>o.status!=="cancelled" && o.t.getMonth()===today.getMonth()).forEach(o=>{
+    map[o.product.k] = (map[o.product.k]||0) + o.amount;
+  });
+  const labels = products.map(p=>p.l);
+  const data = products.map(p=>map[p.k]||0);
+  if(productChart) productChart.destroy();
+  productChart = new Chart(document.getElementById("productChart"),{
+    type:"doughnut",
+    data:{labels,datasets:[{data,backgroundColor:["#0ea5e9","#8b5cf6","#22c55e","#f59e0b"],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:"60%",plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",padding:14,font:{size:11}}}}}
+  });
+}
+function renderProductionChart(){
+  const labels=[], data=[];
+  for(let d=6;d>=0;d--){
+    const dt = new Date(today); dt.setDate(dt.getDate()-d);
+    labels.push(dt.toLocaleDateString("en-IN",{weekday:"short"}));
+    data.push(120 + rand(80));
+  }
+  if(productionChart) productionChart.destroy();
+  productionChart = new Chart(document.getElementById("productionChart"),{
+    type:"bar",
+    data:{labels,datasets:[{label:"Campers filled",data,backgroundColor:"#0ea5e9",borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:"#eef2f7"},ticks:{font:{size:11}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+}
+
+/* ============ ORDERS PAGE ============ */
+let orderFilter = {status:"all",channel:"all"};
+function renderOrders(){
+  let list = orders;
+  if(orderFilter.status!=="all") list = list.filter(o=>o.status===orderFilter.status);
+  if(orderFilter.channel!=="all") list = list.filter(o=>o.channel===orderFilter.channel);
+  const body = document.getElementById("ordersBody");
+  body.innerHTML = list.slice(0,80).map(o=>`
+    <tr>
+      <td><span class="mono">#${o.id}</span></td>
+      <td class="muted">${timeShort(o.t)}</td>
+      <td><span class="avatar">${initials(o.customer.name)}</span>${o.customer.name}<div class="muted" style="font-size:11.5px;margin-left:38px">${o.customer.area}</div></td>
+      <td>${o.qty} × ${o.product.l}</td>
+      <td>${channelBadge(o.channel)}</td>
+      <td class="right mono">${money(o.amount)}</td>
+      <td>${payBadge(o)}</td>
+      <td>${o.staff? o.staff.name : '<span class="muted">—</span>'}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td><button class="btn btn-ghost" style="padding:5px 10px;font-size:12px">Details</button></td>
+    </tr>`).join("");
+}
+document.querySelectorAll("#page-orders .chip").forEach(c=>c.addEventListener("click",()=>{
+  document.querySelectorAll("#page-orders .chip").forEach(x=>x.classList.remove("active"));
+  c.classList.add("active");
+  orderFilter.status = c.dataset.status; renderOrders();
+}));
+document.getElementById("channelFilter").addEventListener("change",e=>{orderFilter.channel=e.target.value;renderOrders();});
+
+/* ============ CUSTOMERS ============ */
+function renderCustomers(){
+  const q = (document.getElementById("custSearch").value||"").toLowerCase();
+  const ar = document.getElementById("custArea").value;
+  const list = customers.filter(c=>{
+    if(ar!=="all" && c.area!==ar) return false;
+    if(!q) return true;
+    return c.name.toLowerCase().includes(q) || c.phone.includes(q) || c.area.toLowerCase().includes(q);
+  }).sort((a,b)=>b.spent-a.spent);
+  document.getElementById("customersBody").innerHTML = list.map(c=>`
+    <tr>
+      <td><span class="avatar">${initials(c.name)}</span>${c.name}</td>
+      <td class="mono">${c.phone}</td>
+      <td>${c.area}</td>
+      <td><span class="badge b-violet">${c.plan}</span></td>
+      <td class="right mono">${c.orders}</td>
+      <td class="right mono">${money(c.spent)}</td>
+      <td class="right mono">${c.dues>0?`<span style="color:var(--red);font-weight:600">${money(c.dues)}</span>`:'—'}</td>
+      <td class="muted">${c.last?timeShort(c.last):'—'}</td>
+    </tr>`).join("");
+}
+document.getElementById("custSearch").addEventListener("input",renderCustomers);
+document.getElementById("custArea").addEventListener("change",renderCustomers);
+
+/* populate area filter */
+(function(){
+  const sel = document.getElementById("custArea");
+  [...new Set(customers.map(c=>c.area))].sort().forEach(a=>{
+    const o = document.createElement("option"); o.value=a; o.textContent=a; sel.appendChild(o);
+  });
+})();
+
+/* ============ REVENUE PAGE ============ */
+function renderRevenue(){
+  const thisMonth = orders.filter(o=>o.status!=="cancelled" && o.t.getMonth()===today.getMonth());
+  const rev = thisMonth.reduce((s,o)=>s+o.amount,0);
+  const units = thisMonth.reduce((s,o)=>s+o.qty,0);
+  const costBase = thisMonth.reduce((s,o)=>s + o.product.cost*o.qty,0); // variable cost
+  const netProfit = rev - totalExpense;
+  document.getElementById("revMonth").textContent = money(rev);
+  document.getElementById("salesMonth").textContent = units.toLocaleString("en-IN");
+  document.getElementById("expMonth").textContent = money(totalExpense);
+  document.getElementById("profitMonth").textContent = money(netProfit);
+  document.getElementById("profitMargin").textContent = rev>0? Math.round(netProfit/rev*100)+"%" : "—";
+
+  // Expenses table
+  document.getElementById("expenseBody").innerHTML = expenses.map(e=>`
+    <tr><td>${e.cat}</td><td class="right mono">${money(e.amount)}</td><td class="right mono">${rev>0?((e.amount/rev)*100).toFixed(1):"0"}%</td></tr>
+  `).join("") + `<tr style="font-weight:700;background:#f8fafc"><td>Total</td><td class="right mono">${money(totalExpense)}</td><td class="right mono">${rev>0?((totalExpense/rev)*100).toFixed(1):"0"}%</td></tr>`;
+
+  // Product table
+  const prodMap = {};
+  thisMonth.forEach(o=>{
+    const k = o.product.k;
+    if(!prodMap[k]) prodMap[k] = {...o.product, units:0, rev:0};
+    prodMap[k].units += o.qty;
+    prodMap[k].rev += o.amount;
+  });
+  document.getElementById("productBody").innerHTML = products.map(p=>{
+    const r = prodMap[p.k] || {units:0,rev:0};
+    const marginU = p.price - p.cost;
+    return `<tr><td><span class="ttl">${p.l}</span><div class="muted" style="font-size:11.5px">${p.desc||''} · ₹${p.price} · cost ₹${p.cost}</div></td><td class="right mono">${r.units}</td><td class="right mono">${money(r.rev)}</td><td class="right mono" style="color:#16a34a">${money(marginU)}</td></tr>`;
+  }).join("");
+
+  renderProfitChart();
+  renderProductChart();
+}
+
+/* ============ INVENTORY ============ */
+function renderInventory(){
+  document.getElementById("invFilled").textContent = 148;
+  document.getElementById("invEmpty").textContent = 62;
+  document.getElementById("invOut").textContent = 412;
+  document.getElementById("invBottles").textContent = "1,240";
+
+  const rows = [
+    ["Filled Campers (chilled)",140,210,188,162],
+    ["Empty Campers (plant)",80,188,206,62],
+    ["Jars (filled · normal)",110,160,130,140],
+    ["Jars (empty, plant)",70,130,160,40]
+  ];
+  document.getElementById("stockBody").innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td class="right mono">${r[1]}</td><td class="right mono" style="color:#16a34a">+${r[2]}</td><td class="right mono" style="color:#dc2626">-${r[3]}</td><td class="right mono ttl">${r[4]}</td></tr>`).join("");
+
+  // jars-out pending returns — top customers with many past orders
+  const top = [...customers].sort((a,b)=>b.orders-a.orders).slice(0,10);
+  document.getElementById("jarsOutBody").innerHTML = top.map((c,i)=>{
+    const jars = 3 + (i%4);
+    const deposit = jars*150;
+    const days = 4 + (i*3)%25;
+    const out = new Date(today); out.setDate(out.getDate()-days);
+    return `<tr><td><span class="avatar">${initials(c.name)}</span>${c.name}</td><td class="mono">${c.phone}</td><td class="right mono">${jars}</td><td class="right mono">${money(deposit)}</td><td class="muted">${out.toLocaleDateString("en-IN",{day:"numeric",month:"short"})} · ${days}d</td></tr>`;
+  }).join("");
+
+  renderProductionChart();
+}
+
+/* ============ PAYMENTS ============ */
+function renderPayments(){
+  const thisMonthOrders = orders.filter(o=>o.status!=="cancelled" && o.t.getMonth()===today.getMonth() && o.paid);
+  const collected = thisMonthOrders.reduce((s,o)=>s+o.amount,0);
+  const upiShare = thisMonthOrders.filter(o=>o.method==="UPI").reduce((s,o)=>s+o.amount,0);
+  document.getElementById("payCollected").textContent = money(collected);
+  document.getElementById("payDues").textContent = money(totalDues);
+  document.getElementById("payUpi").textContent = collected>0? Math.round(upiShare/collected*100)+"%":"0%";
+  document.getElementById("payDays").textContent = "2.3 days";
+
+  const dueList = customers.filter(c=>c.dues>0).sort((a,b)=>b.dues-a.dues).slice(0,14);
+  document.getElementById("duesBody").innerHTML = dueList.map((c,i)=>{
+    const days = 3 + (i*5)%42;
+    const lastPaid = new Date(today); lastPaid.setDate(lastPaid.getDate()-days);
+    const cls = days<7?"b-amber":(days<30?"b-red":"b-red");
+    return `<tr><td><span class="avatar">${initials(c.name)}</span>${c.name}<div class="muted" style="font-size:11.5px;margin-left:38px">${c.area}</div></td><td class="mono">${c.phone}</td><td class="right mono" style="color:var(--red);font-weight:700">${money(c.dues)}</td><td class="muted right">${lastPaid.toLocaleDateString("en-IN",{day:"numeric",month:"short"})}</td><td><span class="badge ${cls}">${days} days</span></td><td><button class="btn btn-ghost" style="padding:5px 10px;font-size:12px">Send Reminder</button></td></tr>`;
+  }).join("");
+
+  const paid = orders.filter(o=>o.paid).slice(0,12);
+  document.getElementById("paymentsBody").innerHTML = paid.map(o=>`<tr><td class="muted">${timeShort(o.t)}</td><td><span class="avatar">${initials(o.customer.name)}</span>${o.customer.name}</td><td><span class="badge ${o.method==="UPI"?"b-blue":"b-gray"}">${o.method}</span></td><td class="right mono">${money(o.amount)}</td><td class="mono muted">#${o.id}</td></tr>`).join("");
+}
+
+/* ============ DELIVERY ============ */
+function renderDelivery(){
+  document.getElementById("delStaff").textContent = staff.filter(s=>s.status==="on-duty").length + "/" + staff.length;
+  const assignedToday = todayOrders.filter(o=>o.staff);
+  const deliveredToday = todayOrders.filter(o=>o.status==="delivered");
+  document.getElementById("delAssigned").textContent = assignedToday.length;
+  document.getElementById("delDone").textContent = deliveredToday.length;
+  document.getElementById("delAvg").textContent = "42 min";
+
+  const counts = {};
+  assignedToday.forEach(o=>{counts[o.staff.id]=counts[o.staff.id]||{a:0,d:0}; counts[o.staff.id].a++; if(o.status==="delivered") counts[o.staff.id].d++;});
+  document.getElementById("staffBody").innerHTML = staff.map(s=>{
+    const c = counts[s.id]||{a:0,d:0};
+    const st = s.status==="on-duty" ? '<span class="badge b-green">On duty</span>' : '<span class="badge b-amber">On break</span>';
+    return `<tr><td><span class="avatar">${initials(s.name)}</span>${s.name}</td><td class="mono">${s.phone}</td><td>${s.route}</td><td class="muted">${s.vehicle}</td><td class="right mono">${c.a}</td><td class="right mono">${c.d}</td><td>${st}</td></tr>`;
+  }).join("");
+
+  // Routes
+  const routes = staff.map(s=>{
+    const sOrders = assignedToday.filter(o=>o.staff?.id===s.id);
+    const done = sOrders.filter(o=>o.status==="delivered").length;
+    const pct = sOrders.length? Math.round(done/sOrders.length*100) : 0;
+    return {s,orders:sOrders,done,pct};
+  });
+  document.getElementById("routesList").innerHTML = routes.map(r=>`
+    <div style="padding:14px 0;border-bottom:1px solid var(--line)">
+      <div class="flex" style="justify-content:space-between;margin-bottom:8px">
+        <div class="flex"><span class="avatar">${initials(r.s.name)}</span><div class="stack"><span class="ttl">${r.s.name}</span><span class="muted" style="font-size:11.5px">${r.s.route} · ${r.s.vehicle}</span></div></div>
+        <div class="stack right"><span class="ttl">${r.done} / ${r.orders.length} stops</span><span class="muted" style="font-size:11.5px">${r.pct}% complete</span></div>
+      </div>
+      <div class="progress"><div class="progress-bar" style="width:${r.pct}%"></div></div>
+    </div>
+  `).join("") || '<div class="muted">No routes assigned yet today.</div>';
+}
+
+/* ============ MODALS ============ */
+function openModal(id){document.getElementById(id).classList.add("show")}
+function closeModal(id){document.getElementById(id).classList.remove("show")}
+function openAddCustomer(){openModal("addCustomerModal")}
+function saveCustomer(){
+  const name = document.getElementById("nc_name").value.trim();
+  const phone = document.getElementById("nc_phone").value.trim();
+  const area = document.getElementById("nc_area").value.trim();
+  if(!name||!phone){alert("Name and phone are required");return;}
+  customers.push({id:++nextCustId,name,phone,area:area||"Unassigned",address:document.getElementById("nc_address").value,plan:document.getElementById("nc_plan").value,orders:0,spent:0,dues:0,last:null});
+  closeModal("addCustomerModal");
+  ["nc_name","nc_phone","nc_area","nc_address"].forEach(i=>document.getElementById(i).value="");
+  renderCustomers();
+}
+
+/* New order */
+document.getElementById("newOrderBtn").addEventListener("click",()=>{
+  const sel = document.getElementById("no_cust");
+  sel.innerHTML = customers.map(c=>`<option value="${c.id}">${c.name} · ${c.phone}</option>`).join("");
+  openModal("newOrderModal");
+});
+function saveOrder(){
+  const cid = parseInt(document.getElementById("no_cust").value);
+  const cust = customers.find(c=>c.id===cid);
+  const [pk,price] = document.getElementById("no_prod").value.split("|");
+  const prod = products.find(p=>p.k===pk);
+  const qty = parseInt(document.getElementById("no_qty").value)||1;
+  const chan = document.getElementById("no_chan").value;
+  const amount = prod.price * qty;
+  orders.unshift({id:++nextOrderId,t:new Date(),customer:cust,product:prod,qty,amount,channel:chan,status:"new",paid:false,method:null,staff:null});
+  cust.orders++; cust.last=new Date();
+  closeModal("newOrderModal");
+  renderOverview(); renderOrders();
+  go("orders");
+}
+
+document.getElementById("rangeSelect")?.addEventListener("change",renderTrendChart);
+
+/* ============ GLOBAL SEARCH ============ */
+document.getElementById("globalSearch").addEventListener("input",e=>{
+  const q = e.target.value.toLowerCase();
+  if(!q) return;
+  // if match a customer, switch to customers page
+  document.getElementById("custSearch").value = q;
+  go("customers");
+  renderCustomers();
+});
+
+/* ============ INIT ============ */
+renderOverview();
+renderOrders();
+renderCustomers();
+renderRevenue();
+renderInventory();
+renderPayments();
+renderDelivery();
+
+/* ============ AUTH + LIVE FIRESTORE ============ */
+function initLiveData(){
+  if(!window.cdDb || window.cdDb.offline){
+    document.getElementById('authSub').textContent = 'Demo mode (Firebase not set up)';
+    document.getElementById('authBtn').style.display = 'none';
+    return;
+  }
+  const pill = document.getElementById('authPill');
+  const av   = document.getElementById('authAv');
+  const name = document.getElementById('authName');
+  const sub  = document.getElementById('authSub');
+  const btn  = document.getElementById('authBtn');
+
+  let unsub = null;
+
+  cdDb.onAuth(user => {
+    if(user){
+      pill.classList.add('signed-in');
+      name.textContent = user.displayName || user.email || 'Owner';
+      sub.textContent  = user.email || '';
+      btn.textContent  = 'Sign out';
+      av.innerHTML     = user.photoURL ? '<img src="'+user.photoURL+'" alt="">' : (user.displayName||'O').charAt(0).toUpperCase();
+
+      // Subscribe to live orders for the banner
+      if(unsub) unsub();
+      unsub = cdDb.listenOrders(orders => {
+        const fresh = orders.filter(o => o.status === 'new');
+        if(fresh.length === 0){
+          document.getElementById('liveBanner').style.display = 'none';
+        } else {
+          document.getElementById('liveBanner').style.display = 'flex';
+          document.getElementById('liveCount').textContent =
+            fresh.length + ' new order' + (fresh.length===1?'':'s');
+        }
+      }, {limit: 50});
+    } else {
+      pill.classList.remove('signed-in');
+      name.textContent = 'Not signed in';
+      sub.textContent  = 'Demo mode';
+      btn.textContent  = 'Sign in';
+      av.textContent   = 'G';
+      av.innerHTML     = 'G';
+      if(unsub){ unsub(); unsub = null; }
+      document.getElementById('liveBanner').style.display = 'none';
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    if(cdDb.auth.currentUser) cdDb.signOut();
+    else cdDb.signInGoogle().catch(e => alert('Sign-in failed: ' + e.message));
+  });
+}
+// Wait for the deferred SDK + db.js to finish loading
+window.addEventListener('load', () => setTimeout(initLiveData, 300));
+
+</script>
+<script src="bottombar.js" defer></script>
+</body>
+</html>
+                                                       
